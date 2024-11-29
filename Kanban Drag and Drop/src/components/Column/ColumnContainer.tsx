@@ -11,19 +11,50 @@ interface Props {
 }
 
 const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: id,
-      data: {
-        type: "Column",
-        col,
-      },
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: id,
+    data: {
+      type: "Column",
+      col,
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  if (isDragging) {
+    return (
+      <motion.div
+        className="
+        bg-slate-100
+        bg-opacity-5
+        h-auto
+        w-[350px]
+        max-h-[500px]
+        border-2
+        border-gray-100
+        rounded-md
+        flex
+        flex-col
+        gap-3
+        p-2
+    "
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+      ></motion.div>
+    );
+  }
 
   return (
     <motion.div

@@ -5,14 +5,20 @@ import { Column, Id } from "../../types";
 import { v4 } from "uuid";
 import ColumnContainer from "../Column/ColumnContainer";
 
-import { DndContext, DragStartEvent } from "@dnd-kit/core";
-import { SortableContext } from "@dnd-kit/sortable";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from "@dnd-kit/core";
+import { arrayMove, SortableContext } from "@dnd-kit/sortable";
+import { createPortal } from "react-dom";
 
 const Board = () => {
   const [columns, setColumns] = useState<Column[]>([]);
+  const [activeColumn, setActiveColumn] = useState<Column>();
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
-  console.log({ columnsId });
 
   //Generating new column on clicking the add button
   const generateNewColumn = () => {
@@ -30,8 +36,27 @@ const Board = () => {
     setColumns(filteredColumns);
   };
 
+  //Handling the start of the drag for drag overlay
   const handleDragStart = (e: DragStartEvent) => {
-    console.log("Drag Start", e);
+    console.log("Event", e);
+    if (e.active.data.current?.type === "Column") {
+      setActiveColumn(e.active.data.current.col);
+      return;
+    }
+  };
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    const { active, over } = e;
+    if (!over) return;
+    if (active.id === over?.id) return;
+
+    if (active.id !== over?.id) {
+      setColumns((prev) => {
+        const oldIndex = prev.findIndex((col) => col.id === active.id);
+        const newIndex = prev.findIndex((col) => col.id === over?.id);
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
   };
 
   return (
@@ -79,7 +104,7 @@ const Board = () => {
           Add Column
         </motion.button>
       </motion.div>
-      <DndContext onDragStart={handleDragStart}>
+      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="m-auto flex mt-[35px] gap-[15px] ">
           <SortableContext items={columnsId}>
             {columns.map((column) => (
@@ -92,6 +117,19 @@ const Board = () => {
             ))}
           </SortableContext>
         </div>
+        {/* Drag Overlay */}{" "}
+        {createPortal(
+          <DragOverlay>
+            {activeColumn && (
+              <ColumnContainer
+                col={activeColumn}
+                id={activeColumn.id}
+                deleteColumn={deleteColumn}
+              />
+            )}
+          </DragOverlay>,
+          document.body
+        )}
       </DndContext>
     </motion.div>
   );
