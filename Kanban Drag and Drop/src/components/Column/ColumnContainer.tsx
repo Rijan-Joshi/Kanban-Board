@@ -8,11 +8,12 @@ import { useState } from "react";
 interface Props {
   col: Column;
   deleteColumn: (id: Id) => void;
+  updateColumn: (id: Id, val: string) => void;
   id: Id;
 }
 
-const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
-  const [editing, setEditing] = useState<boolean>(false);
+const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
+  const [editMode, setEditMode] = useState<boolean>(false);
 
   const {
     attributes,
@@ -75,13 +76,32 @@ const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
     "
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
     >
-      <motion.div className="flex gap-3 items-center mb-2">
-        <div className="bg-gray-50 bg-opacity-5 rounded-full p-2 pt-1 pb-1 gap-1 flex items-center">
+      <motion.div
+        className="flex gap-3 items-center mb-2"
+        {...attributes}
+        {...listeners}
+        onClick={() => setEditMode(true)}
+      >
+        <div className="bg-gray-50 bg-opacity-5 rounded-full p-3 pt-1 pb-1 gap-1 flex items-center">
           <div className="w-3 h-3 rounded-full bg-current" />
-          <div className="title">Backlog</div>
+          <div className="title pl-2">
+            {!editMode ? (
+              col.title
+            ) : (
+              <input
+                value={col.title}
+                className="bg-transparent outline-none"
+                autoFocus
+                onChange={(e) => updateColumn(col.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") return;
+                  setEditMode(false);
+                }}
+                onBlur={() => setEditMode(false)}
+              />
+            )}
+          </div>
         </div>
         <div>2</div>
 

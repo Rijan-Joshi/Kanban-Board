@@ -62,8 +62,20 @@ const Board = () => {
     }
   };
 
-  // Fixing DeleteButton Not Working
+  //Updating the title
+  const updateColumn = (id: Id, title: string) => {
+    const updatedColumns = columns.map((col) => {
+      if (col.id === id) {
+        col.title = title;
+        return col;
+      } else {
+        return col;
+      }
+    });
+    setColumns(updatedColumns);
+  };
 
+  // Fixing DeleteButton Not Working
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -130,6 +142,7 @@ const Board = () => {
                 col={column}
                 id={column.id}
                 deleteColumn={deleteColumn}
+                updateColumn={updateColumn}
               />
             ))}
           </SortableContext>
@@ -142,6 +155,7 @@ const Board = () => {
                 col={activeColumn}
                 id={activeColumn.id}
                 deleteColumn={deleteColumn}
+                updateColumn={updateColumn}
               />
             )}
           </DragOverlay>,
