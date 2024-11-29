@@ -1,13 +1,30 @@
 import { motion } from "framer-motion";
 import { Column, Id } from "../../types";
 import Trash from "../../icons/Trash";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Props {
   col: Column;
   deleteColumn: (id: Id) => void;
+  id: Id;
 }
 
-const ColumnContainer = ({ col, deleteColumn }: Props) => {
+const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: id,
+      data: {
+        type: "Column",
+        col,
+      },
+    });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
     <motion.div
       className="
@@ -22,6 +39,10 @@ const ColumnContainer = ({ col, deleteColumn }: Props) => {
         gap-3
         p-2
     "
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
     >
       <motion.div className="flex gap-3 items-center mb-2">
         <div className="bg-gray-50 bg-opacity-5 rounded-full p-2 pt-1 pb-1 gap-1 flex items-center">
