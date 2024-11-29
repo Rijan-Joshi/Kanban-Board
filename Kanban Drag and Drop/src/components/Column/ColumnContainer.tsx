@@ -3,6 +3,7 @@ import { Column, Id } from "../../types";
 import Trash from "../../icons/Trash";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useState } from "react";
 
 interface Props {
   col: Column;
@@ -11,6 +12,8 @@ interface Props {
 }
 
 const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
+  const [editing, setEditing] = useState<boolean>(false);
+
   const {
     attributes,
     listeners,
@@ -78,7 +81,7 @@ const ColumnContainer = ({ col, deleteColumn, id }: Props) => {
       <motion.div className="flex gap-3 items-center mb-2">
         <div className="bg-gray-50 bg-opacity-5 rounded-full p-2 pt-1 pb-1 gap-1 flex items-center">
           <div className="w-3 h-3 rounded-full bg-current" />
-          <div className="">Backlog</div>
+          <div className="title">Backlog</div>
         </div>
         <div>2</div>
 

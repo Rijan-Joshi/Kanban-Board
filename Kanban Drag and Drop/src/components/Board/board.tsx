@@ -10,6 +10,9 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
@@ -59,6 +62,16 @@ const Board = () => {
     }
   };
 
+  // Fixing DeleteButton Not Working
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 3,
+      },
+    })
+  );
+
   return (
     <motion.div
       className="
@@ -104,7 +117,11 @@ const Board = () => {
           Add Column
         </motion.button>
       </motion.div>
-      <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <div className="m-auto flex mt-[35px] gap-[15px] ">
           <SortableContext items={columnsId}>
             {columns.map((column) => (
