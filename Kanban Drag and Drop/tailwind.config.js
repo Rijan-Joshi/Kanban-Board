@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors:{
-        'kanban-primary': '#3182ce',
-        'kanban-secondary': '#718096',
+        'kanban-primary': '#3B3F45',
+        'kanban-secondary': '#5A5F66',
       },
       boxShadow: {
         'kanban-card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',

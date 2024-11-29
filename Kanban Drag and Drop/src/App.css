@@ -1,0 +1,4 @@
+html,
+body, #root{
+    @apply text-white box-border;
+}
