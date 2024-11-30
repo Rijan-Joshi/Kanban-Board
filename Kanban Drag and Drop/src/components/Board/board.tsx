@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import Add from "../../icons/add";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Column, Id, Task } from "../../types";
 import { v4 } from "uuid";
 import ColumnContainer from "../Column/ColumnContainer";
@@ -19,13 +19,30 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "../Card/TaskCard";
 
+const LOCAL_STORAGE_COLUMNS_KEY = "kanban-columns";
+const LOCAL_STORAGE_TASKS_KEY = "kanban-tasks";
+
 const Board = () => {
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [columns, setColumns] = useState<Column[]>(() => {
+    const savedColumns = localStorage.getItem(LOCAL_STORAGE_COLUMNS_KEY);
+    return savedColumns ? JSON.parse(savedColumns) : [];
+  });
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    const savedTasks = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_COLUMNS_KEY, JSON.stringify(columns));
+  }, [columns]);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_TASKS_KEY, JSON.stringify(tasks));
+  }, [tasks]);
 
   //Generating new column on clicking the add button
   const generateNewColumn = () => {
@@ -40,7 +57,9 @@ const Board = () => {
   //Deleting the columns not required
   const deleteColumn = (id: Id) => {
     const filteredColumns = columns.filter((col) => col.id !== id);
+    const remainingTasks = tasks.filter((task) => task.columnId !== id);
     setColumns(filteredColumns);
+    setTasks(remainingTasks);
   };
 
   //Handling the start of the drag for drag overlay
