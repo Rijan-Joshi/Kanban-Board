@@ -22,11 +22,17 @@ import TaskCard from "../Card/TaskCard";
 const LOCAL_STORAGE_COLUMNS_KEY = "kanban-columns";
 const LOCAL_STORAGE_TASKS_KEY = "kanban-tasks";
 
+interface BoardState {
+  columns: Column[];
+  tasks: Task[];
+}
+
 const Board = () => {
   const [columns, setColumns] = useState<Column[]>(() => {
     const savedColumns = localStorage.getItem(LOCAL_STORAGE_COLUMNS_KEY);
     return savedColumns ? JSON.parse(savedColumns) : [];
   });
+
   const [tasks, setTasks] = useState<Task[]>(() => {
     const savedTasks = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
     return savedTasks ? JSON.parse(savedTasks) : [];
