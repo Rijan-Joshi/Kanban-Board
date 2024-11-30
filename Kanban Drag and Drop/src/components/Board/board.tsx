@@ -171,7 +171,7 @@ const Board = () => {
         overflow-x-auto
         overflow-y-hidden
         p-[40px]
-        border-2
+        
         rounded-md
       "
       transition={{ duration: 0.2 }}
