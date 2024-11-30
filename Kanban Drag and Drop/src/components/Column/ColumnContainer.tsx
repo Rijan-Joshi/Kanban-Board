@@ -1,19 +1,36 @@
 import { motion } from "framer-motion";
-import { Column, Id } from "../../types";
+import { Column, Id, Task } from "../../types";
 import Trash from "../../icons/Trash";
-import { useSortable } from "@dnd-kit/sortable";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Adding from "../../icons/Adding";
+import TaskCard from "../Card/TaskCard";
 
 interface Props {
+  id: Id;
   col: Column;
   deleteColumn: (id: Id) => void;
+  deleteTask: (id: Id) => void;
   updateColumn: (id: Id, val: string) => void;
-  id: Id;
+  createTask: (ColumnId: Id) => void;
+  updateTask: (id: Id, content: string) => void;
+  tasks: Task[];
 }
 
-const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
+const ColumnContainer = ({
+  col,
+  deleteColumn,
+  id,
+  updateColumn,
+  createTask,
+  tasks,
+  deleteTask,
+  updateTask,
+}: Props) => {
   const [editMode, setEditMode] = useState<boolean>(false);
+
+  const activeIds = useMemo(() => tasks.map((task) => task.id), [tasks]);
 
   const {
     attributes,
@@ -28,6 +45,7 @@ const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
       type: "Column",
       col,
     },
+    disabled: editMode,
   });
 
   const style = {
@@ -63,12 +81,10 @@ const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
   return (
     <motion.div
       className="
-        bg-slate-100
-        bg-opacity-5
         h-auto
         w-[350px]
         max-h-[500px]
-        rounded-md
+        
         flex
         flex-col
         gap-3
@@ -78,7 +94,8 @@ const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
       style={style}
     >
       <motion.div
-        className="flex gap-3 items-center mb-2"
+        className="flex bg-slate-100
+        bg-opacity-5 p-2 rounded-md gap-3 items-center mb-2"
         {...attributes}
         {...listeners}
         onClick={() => setEditMode(true)}
@@ -90,8 +107,7 @@ const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
               col.title
             ) : (
               <input
-                value={col.title}
-                className="bg-transparent outline-none"
+                className="bg-transparent outline-none w-[60%]"
                 autoFocus
                 onChange={(e) => updateColumn(col.id, e.target.value)}
                 onKeyDown={(e) => {
@@ -103,17 +119,40 @@ const ColumnContainer = ({ col, deleteColumn, id, updateColumn }: Props) => {
             )}
           </div>
         </div>
-        <div>2</div>
+        <div>{tasks.length}</div>
 
         <motion.button
           onClick={() => deleteColumn(col.id)}
-          className="flex items-center ml-auto cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:p-2 hover:rounded-md"
+          className=" flex items-center ml-auto cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:p-2 hover:rounded-md"
         >
           <Trash />
         </motion.button>
       </motion.div>
-      <motion.div className="flex flex-grow"> Cards </motion.div>
-      <motion.div> Footer </motion.div>
+      <motion.div
+        className=" bg-slate-100
+        bg-opacity-5 p-2 pt-[25px] h-[500px] max-h-[600px] rounded-md flex flex-grow overflow-auto flex-col gap-4"
+      >
+        <SortableContext items={activeIds}>
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              id={task.id}
+              content={task.content}
+              deleteTask={deleteTask}
+              updateTask={updateTask}
+            />
+          ))}
+        </SortableContext>
+      </motion.div>
+
+      <motion.button
+        className="inline-flex max-w-fit gap-3 p-[5px] pl-2 rounded-md cursor-pointer hover:bg-gray-50 hover:bg-opacity-5 hover:border-2 hover:border-white"
+        onClick={() => createTask(id)}
+      >
+        <Adding />
+        Add Task
+      </motion.button>
     </motion.div>
   );
 };
